@@ -108,6 +108,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28d3b2b1366ec20994f1fd18c3c594f05c5dd4bc44d8bb0c1c632c8d6829481f"
 
 [[package]]
+name = "schematic-tree-sitter-c"
+version = "0.24.3"
+dependencies = [
+ "cc",
+ "tree-sitter",
+ "tree-sitter-language",
+]
+
+[[package]]
 name = "serde"
 version = "1.0.219"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -174,15 +183,6 @@ dependencies = [
  "regex-syntax",
  "serde_json",
  "streaming-iterator",
- "tree-sitter-language",
-]
-
-[[package]]
-name = "tree-sitter-c"
-version = "0.24.2"
-dependencies = [
- "cc",
- "tree-sitter",
  "tree-sitter-language",
 ]
 

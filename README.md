@@ -1,5 +1,12 @@
 # tree-sitter-c
 
+This is Schematic's MIT-licensed fork of upstream `tree-sitter-c` v0.24.2.
+The Rust package is [`schematic-tree-sitter-c`](https://crates.io/crates/schematic-tree-sitter-c);
+its Rust library name remains `tree_sitter_c`. The fork fixes block comments in
+continued macro definitions and conditionally selected `if` headers with shared bodies.
+
+The upstream project information below is retained for attribution.
+
 [![CI][ci]](https://github.com/tree-sitter/tree-sitter-c/actions/workflows/ci.yml)
 [![discord][discord]](https://discord.gg/w7nTvsVJhm)
 [![matrix][matrix]](https://matrix.to/#/#tree-sitter-chat:matrix.org)
