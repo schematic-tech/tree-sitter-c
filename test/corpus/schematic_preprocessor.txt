@@ -1,0 +1,147 @@
+================================================================================
+Comments within continued macro bodies
+================================================================================
+
+#define HASH(key) do { \
+  switch (key) { \
+    case 1: key++; /* FALLTHROUGH */ \
+    default: break; \
+  } \
+  /* Mix the final value. */ \
+  key ^= key << 3; \
+} while (0)
+#define APPEND(head, add) do { \
+  if (head) { \
+    (add)->next = head; /* use add as a temporary */ \
+  } else { \
+    (head) = (add); \
+  } \
+} while (0)
+void after_macros(void) {}
+
+--------------------------------------------------------------------------------
+
+(translation_unit
+  (preproc_function_def
+    (identifier)
+    (preproc_params
+      (identifier))
+    (preproc_arg))
+  (preproc_function_def
+    (identifier)
+    (preproc_params
+      (identifier)
+      (identifier))
+    (preproc_arg))
+  (function_definition
+    (primitive_type)
+    (function_declarator
+      (identifier)
+      (parameter_list
+        (parameter_declaration
+          (primitive_type))))
+    (compound_statement)))
+
+================================================================================
+Conditionally selected if headers with a shared body
+================================================================================
+
+void read_peer(void) {
+#ifdef PLATFORM_A
+    if (read_mem(ptr, pid, start, len)) {
+#else
+    if (read_mem(ptr, fd, start, len)) {
+#endif
+        report_error();
+    }
+#if VERSION == 1
+    if (old_read(ptr)) {
+#elif VERSION == 2
+    if (current_read(ptr)) {
+#else
+    if (new_read(ptr)) {
+#endif
+        retry();
+    } else {
+        finish();
+    }
+}
+void after_conditionals(void) {}
+
+--------------------------------------------------------------------------------
+
+(translation_unit
+  (function_definition
+    (primitive_type)
+    (function_declarator
+      (identifier)
+      (parameter_list
+        (parameter_declaration
+          (primitive_type))))
+    (compound_statement
+      (if_statement
+        (preproc_if_condition
+          (identifier)
+          (parenthesized_expression
+            (call_expression
+              (identifier)
+              (argument_list
+                (identifier)
+                (identifier)
+                (identifier)
+                (identifier))))
+          (parenthesized_expression
+            (call_expression
+              (identifier)
+              (argument_list
+                (identifier)
+                (identifier)
+                (identifier)
+                (identifier)))))
+        (compound_statement
+          (expression_statement
+            (call_expression
+              (identifier)
+              (argument_list)))))
+      (if_statement
+        (preproc_if_condition
+          (binary_expression
+            (identifier)
+            (number_literal))
+          (parenthesized_expression
+            (call_expression
+              (identifier)
+              (argument_list
+                (identifier))))
+          (binary_expression
+            (identifier)
+            (number_literal))
+          (parenthesized_expression
+            (call_expression
+              (identifier)
+              (argument_list
+                (identifier))))
+          (parenthesized_expression
+            (call_expression
+              (identifier)
+              (argument_list
+                (identifier)))))
+        (compound_statement
+          (expression_statement
+            (call_expression
+              (identifier)
+              (argument_list))))
+        (else_clause
+          (compound_statement
+            (expression_statement
+              (call_expression
+                (identifier)
+                (argument_list))))))))
+  (function_definition
+    (primitive_type)
+    (function_declarator
+      (identifier)
+      (parameter_list
+        (parameter_declaration
+          (primitive_type))))
+    (compound_statement)))

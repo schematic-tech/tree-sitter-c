@@ -75,8 +75,7 @@ Object-like macro definitions
     value: (preproc_arg))
   (preproc_def
     name: (identifier)
-    value: (preproc_arg)
-    (comment))
+    value: (preproc_arg))
   (preproc_function_def
     name: (identifier)
     parameters: (preproc_params

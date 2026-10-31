@@ -162,7 +162,7 @@ module.exports = grammar({
     ...preprocIf('_in_enumerator_list', $ => seq($.enumerator, ',')),
     ...preprocIf('_in_enumerator_list_no_comma', $ => $.enumerator, -1),
 
-    preproc_arg: _ => token(prec(-1, /\S([^/\n]|\/[^*]|\\\r?\n)*/)),
+    preproc_arg: _ => token(prec(-1, /\S([^/\n]|\/[^*\n]|\/\*[^*]*\*+([^/*][^*]*\*+)*\/|\\\r?\n)*/)),
     preproc_directive: _ => /#[ \t]*[a-zA-Z0-9]\w*/,
 
     _preproc_expression: $ => choice(
@@ -842,11 +842,38 @@ module.exports = grammar({
     ),
 
     if_statement: $ => prec.right(seq(
-      'if',
-      field('condition', $.parenthesized_expression),
-      field('consequence', $.statement),
+      choice(
+        seq(
+          'if',
+          field('condition', $.parenthesized_expression),
+          field('consequence', $.statement),
+        ),
+        seq(
+          $.preproc_if_condition,
+          field('consequence', alias($._preproc_shared_if_body, $.compound_statement)),
+        ),
+      ),
       optional(field('alternative', $.else_clause)),
     )),
+
+    // Conditional compilation may choose an if header while sharing its body.
+    // Each branch opens the same block; parsing both as complete statements
+    // would consume the enclosing function and lose subsequent declarations.
+    preproc_if_condition: $ => seq(
+      choice(
+        seq(preprocessor('if'), field('condition', $._preproc_expression), '\n'),
+        seq(choice(preprocessor('ifdef'), preprocessor('ifndef')), field('name', $.identifier)),
+      ),
+      $._preproc_if_open,
+      repeat(seq(preprocessor('elif'), field('condition', $._preproc_expression), '\n', $._preproc_if_open)),
+      preprocessor('else'),
+      $._preproc_if_open,
+      preprocessor('endif'),
+    ),
+
+    _preproc_if_open: $ => seq('if', field('condition', $.parenthesized_expression), '{'),
+
+    _preproc_shared_if_body: $ => seq(repeat($._block_item), '}'),
 
     else_clause: $ => seq('else', $.statement),
 
